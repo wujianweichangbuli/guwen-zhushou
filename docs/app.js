@@ -35,7 +35,8 @@ function showMessage(text, isError = false) {
 }
 
 async function loadJson(path) {
-  const response = await fetch(path, { cache: "no-store" });
+  const separator = path.includes("?") ? "&" : "?";
+  const response = await fetch(`${path}${separator}v=${Date.now()}`, { cache: "no-store" });
   if (!response.ok) {
     throw new Error(`无法读取 ${path}`);
   }
