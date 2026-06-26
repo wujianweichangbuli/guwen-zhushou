@@ -6,10 +6,19 @@ const state = {
   activeChapterId: null,
 };
 
+const GITHUB_OWNER = "wujianweichangbuli";
+const GITHUB_REPO = "guwen-zhushou";
+const GITHUB_BRANCH = "main";
+const GITHUB_TOKEN_KEY = "guwen-github-token";
+
 const $ = (id) => document.getElementById(id);
 
 function storageKey(bookId) {
   return `guwen-notes:${bookId}`;
+}
+
+function notesDataPath(bookId) {
+  return `docs/data/notes/${bookId}.json`;
 }
 
 function showMessage(text, isError = false) {
@@ -49,13 +58,24 @@ async function loadBook(bookId) {
   const book = await loadJson(`./data/${encodeURIComponent(bookId)}.json`);
   state.activeBookId = bookId;
   state.book = book;
-  state.notes = loadLocalNotes(bookId);
+  const publishedNotes = await loadPublishedNotes(bookId);
+  state.notes = mergeNotes(publishedNotes, loadLocalNotes(bookId));
+  saveLocalNotes();
   state.activeChapterId = state.book.chapters[0]?.id || null;
   $("searchInput").value = "";
   $("searchResults").hidden = true;
   renderBookList();
   renderChapterList();
   renderBook();
+}
+
+async function loadPublishedNotes(bookId) {
+  try {
+    const data = await loadJson(`./data/notes/${encodeURIComponent(bookId)}.json`);
+    return data.notes || {};
+  } catch {
+    return {};
+  }
 }
 
 function loadLocalNotes(bookId) {
@@ -68,6 +88,23 @@ function loadLocalNotes(bookId) {
 
 function saveLocalNotes() {
   localStorage.setItem(storageKey(state.activeBookId), JSON.stringify(state.notes));
+}
+
+function mergeNotes(base, override) {
+  const merged = { ...(base || {}) };
+  for (const [paragraphId, note] of Object.entries(override || {})) {
+    const current = merged[paragraphId];
+    if (!current || isNewerOrEqual(note.updated_at, current.updated_at)) {
+      merged[paragraphId] = note;
+    }
+  }
+  return merged;
+}
+
+function isNewerOrEqual(left, right) {
+  if (!right) return true;
+  if (!left) return false;
+  return new Date(left).getTime() >= new Date(right).getTime();
 }
 
 function renderBookList() {
@@ -179,19 +216,43 @@ function bindParagraphEditors() {
   });
 }
 
-function saveParagraph(paragraphId) {
+function saveParagraph(paragraphId, options = {}) {
   const noteEl = document.querySelector(`[data-note="${cssEscape(paragraphId)}"]`);
   const tagsEl = document.querySelector(`[data-tags="${cssEscape(paragraphId)}"]`);
   const statusEl = document.querySelector(`[data-status="${cssEscape(paragraphId)}"]`);
   const saveState = document.querySelector(`[data-save-state="${cssEscape(paragraphId)}"]`);
-  state.notes[paragraphId] = {
+  if (!noteEl || !tagsEl || !statusEl) return;
+
+  const next = {
     my_note: noteEl.value,
     tags: splitTags(tagsEl.value),
     status: statusEl.value,
     updated_at: new Date().toISOString(),
   };
+  const previous = state.notes[paragraphId];
+  const empty = !next.my_note.trim() && !next.tags.length && next.status === "unread";
+  if (!previous && empty) return;
+  if (previous && sameNote(previous, next)) return;
+
+  state.notes[paragraphId] = next;
   saveLocalNotes();
-  saveState.textContent = `已保存到当前浏览器：${state.notes[paragraphId].updated_at}`;
+  if (saveState && !options.silent) {
+    saveState.textContent = `已保存到当前浏览器：${state.notes[paragraphId].updated_at}`;
+  }
+}
+
+function sameNote(left, right) {
+  return (
+    (left.my_note || "") === (right.my_note || "") &&
+    (left.status || "unread") === (right.status || "unread") &&
+    JSON.stringify(left.tags || []) === JSON.stringify(right.tags || [])
+  );
+}
+
+function collectVisibleEditors() {
+  document.querySelectorAll("[data-note]").forEach((editor) => {
+    saveParagraph(editor.dataset.note, { silent: true });
+  });
 }
 
 function splitTags(value) {
@@ -271,6 +332,7 @@ function runSearch() {
 
 function exportBook() {
   if (!state.book) return;
+  collectVisibleEditors();
   const chapterMap = Object.fromEntries(state.book.chapters.map((chapter) => [chapter.id, chapter]));
   const lines = [
     `# ${state.book.title}`,
@@ -294,6 +356,134 @@ function exportBook() {
     }
   }
   downloadText(`${state.book.title}-阅读注释.md`, lines.join("\n").trim() + "\n");
+}
+
+async function loadGithubNotes() {
+  if (!state.book) return;
+  const token = getGithubToken();
+  try {
+    showMessage("正在从 GitHub 读取注释...");
+    const remote = await readGithubJson(notesDataPath(state.activeBookId), token);
+    if (!remote?.notes) {
+      showMessage("GitHub 上还没有这本书的注释文件。", true);
+      return;
+    }
+    state.notes = mergeNotes(state.notes, remote.notes);
+    saveLocalNotes();
+    renderBook();
+    showMessage("已读取 GitHub 注释，并与当前浏览器注释合并。");
+  } catch (error) {
+    showMessage(error.message, true);
+  }
+}
+
+async function uploadGithubNotes() {
+  if (!state.book) return;
+  collectVisibleEditors();
+  const token = getGithubToken();
+  if (!token) {
+    showMessage("上传需要 GitHub token。请填入有 Contents 读写权限的 token。", true);
+    return;
+  }
+
+  const noteFile = {
+    book_id: state.activeBookId,
+    notes: state.notes,
+  };
+  const content = JSON.stringify(noteFile, null, 2) + "\n";
+  const message = `Sync notes for ${state.book.title}`;
+
+  try {
+    showMessage("正在上传注释到 GitHub...");
+    await putGithubFile(`library/notes/${state.activeBookId}.json`, content, message, token);
+    await putGithubFile(notesDataPath(state.activeBookId), content, message, token);
+    showMessage("注释已上传到 GitHub。GitHub Pages 可能需要几十秒到几分钟刷新。");
+  } catch (error) {
+    showMessage(error.message, true);
+  }
+}
+
+async function readGithubJson(path, token) {
+  const file = await getGithubFile(path, token);
+  if (!file) return null;
+  return JSON.parse(decodeBase64Unicode(file.content || ""));
+}
+
+async function putGithubFile(path, content, message, token) {
+  const existing = await getGithubFile(path, token);
+  const response = await fetch(githubContentsUrl(path), {
+    method: "PUT",
+    headers: githubHeaders(token),
+    body: JSON.stringify({
+      message,
+      content: encodeBase64Unicode(content),
+      branch: GITHUB_BRANCH,
+      sha: existing?.sha,
+    }),
+  });
+  if (!response.ok) {
+    throw new Error(await githubErrorMessage(response, `无法上传 ${path}`));
+  }
+}
+
+async function getGithubFile(path, token) {
+  const response = await fetch(`${githubContentsUrl(path)}?ref=${encodeURIComponent(GITHUB_BRANCH)}`, {
+    headers: githubHeaders(token),
+  });
+  if (response.status === 404) return null;
+  if (!response.ok) {
+    throw new Error(await githubErrorMessage(response, `无法读取 ${path}`));
+  }
+  return response.json();
+}
+
+function githubContentsUrl(path) {
+  return `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}`;
+}
+
+function githubHeaders(token) {
+  const headers = {
+    Accept: "application/vnd.github+json",
+    "X-GitHub-Api-Version": "2022-11-28",
+  };
+  if (token) headers.Authorization = `Bearer ${token}`;
+  return headers;
+}
+
+async function githubErrorMessage(response, fallback) {
+  try {
+    const data = await response.json();
+    return `${fallback}：${data.message || response.status}`;
+  } catch {
+    return `${fallback}：${response.status}`;
+  }
+}
+
+function getGithubToken() {
+  const token = $("githubToken")?.value.trim() || "";
+  if (token) localStorage.setItem(GITHUB_TOKEN_KEY, token);
+  return token;
+}
+
+function restoreGithubToken() {
+  const token = localStorage.getItem(GITHUB_TOKEN_KEY) || "";
+  if ($("githubToken")) $("githubToken").value = token;
+}
+
+function decodeBase64Unicode(value) {
+  const clean = value.replace(/\s/g, "");
+  const binary = atob(clean);
+  const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+  return new TextDecoder().decode(bytes);
+}
+
+function encodeBase64Unicode(value) {
+  const bytes = new TextEncoder().encode(value);
+  let binary = "";
+  for (let index = 0; index < bytes.length; index += 0x8000) {
+    binary += String.fromCharCode(...bytes.subarray(index, index + 0x8000));
+  }
+  return btoa(binary);
 }
 
 function downloadText(filename, content) {
@@ -328,5 +518,13 @@ $("searchInput").addEventListener("input", () => {
   searchTimer = window.setTimeout(runSearch, 180);
 });
 $("exportButton").addEventListener("click", exportBook);
+$("loadGithubNotesButton").addEventListener("click", loadGithubNotes);
+$("uploadGithubNotesButton").addEventListener("click", uploadGithubNotes);
+$("githubToken").addEventListener("change", () => {
+  const token = $("githubToken").value.trim();
+  if (token) localStorage.setItem(GITHUB_TOKEN_KEY, token);
+  else localStorage.removeItem(GITHUB_TOKEN_KEY);
+});
 
+restoreGithubToken();
 loadBooks().catch((error) => showMessage(error.message, true));

@@ -111,11 +111,14 @@ button {
 
 .toolbar-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   align-items: center;
+  justify-content: flex-end;
 }
 
-#searchInput {
+#searchInput,
+#githubToken {
   width: min(34vw, 420px);
   min-width: 220px;
   padding: 10px 12px;
@@ -144,6 +147,33 @@ button:hover {
 .message.error {
   color: var(--danger);
   background: #fff5f2;
+}
+
+.sync-panel {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(240px, 360px) auto auto;
+  gap: 10px;
+  align-items: center;
+  margin: 18px 28px 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.sync-panel h2 {
+  margin: 0 0 2px;
+}
+
+.sync-panel p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+#githubToken {
+  width: 100%;
+  min-width: 0;
 }
 
 .search-results {
@@ -282,13 +312,21 @@ button:hover {
   }
 
   .toolbar,
-  .toolbar-actions {
+  .toolbar-actions,
+  .sync-panel {
     display: block;
   }
 
   #searchInput,
-  #exportButton {
+  #githubToken,
+  #exportButton,
+  #loadGithubNotesButton,
+  #uploadGithubNotesButton {
     width: 100%;
     margin-top: 10px;
+  }
+
+  .toolbar-actions {
+    justify-content: flex-start;
   }
 }

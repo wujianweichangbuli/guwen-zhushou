@@ -8,12 +8,15 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 BOOKS_DIR = ROOT / "library" / "books"
+NOTES_DIR = ROOT / "library" / "notes"
 DOCS_DIR = ROOT / "docs"
 DATA_DIR = DOCS_DIR / "data"
+DOCS_NOTES_DIR = DATA_DIR / "notes"
 
 
 def main() -> None:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
+    DOCS_NOTES_DIR.mkdir(parents=True, exist_ok=True)
     (DOCS_DIR / ".nojekyll").write_text("", encoding="utf-8")
 
     books = []
@@ -36,6 +39,13 @@ def main() -> None:
         json.dumps({"books": books}, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
+
+    for note_path in sorted(NOTES_DIR.glob("*.json")):
+        notes = json.loads(note_path.read_text(encoding="utf-8"))
+        (DOCS_NOTES_DIR / note_path.name).write_text(
+            json.dumps(notes, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
 
     shutil.copyfile(ROOT / "reader" / "static" / "styles.css", DOCS_DIR / "styles.css")
     print(f"已生成 GitHub Pages 静态站点：{DOCS_DIR}")

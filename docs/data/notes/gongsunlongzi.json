@@ -1,0 +1,49 @@
+{
+  "book_id": "gongsunlongzi",
+  "notes": {
+    "gongsunlongzi-ch01-p001": {
+      "my_note": "读完第一段，我还是有很多困惑，比如为什么会选白马这个选择例子；其次我认为颜色和形体是解释名和实的一种对比",
+      "tags": [
+        "困惑"
+      ],
+      "status": "reading",
+      "updated_at": "2026-05-31T18:25:46+00:00"
+    },
+    "gongsunlongzi-ch01-p003": {
+      "my_note": "孔子的本意应该是希望君王能保持仁心，以己推人，在天下施展仁政。此处使用孔子的言论来回应孔穿颇具诡辩之能。",
+      "tags": [],
+      "status": "reading",
+      "updated_at": "2026-05-31T18:35:16+00:00"
+    },
+    "gongsunlongzi-ch02-p004": {
+      "my_note": "白马非马阐述的并不是辨明事物的道理，相反它试图给予启发，让人去思考关于‘‘道’’这个非常模糊的概念。",
+      "tags": [],
+      "status": "unread",
+      "updated_at": "2026-06-01T05:48:41+00:00"
+    },
+    "gongsunlongzi-ch02-p008": {
+      "my_note": "世界万物无需定义就存在这里，人从心出发去赋予万物以名，那么人赋予的名是否就是万物本来的实？我认为是否，所以白马非马",
+      "tags": [],
+      "status": "unread",
+      "updated_at": "2026-06-01T05:51:33+00:00"
+    },
+    "gongsunlongzi-ch03-p001": {
+      "my_note": "事物天然有实，后天用名；前指为名后指为实，所以指非指。",
+      "tags": [],
+      "status": "unread",
+      "updated_at": "2026-06-01T05:53:31+00:00"
+    },
+    "gongsunlongzi-ch03-p004": {
+      "my_note": "这段看似很绕，但实际仍在阐述作者的名实分立的思想",
+      "tags": [],
+      "status": "unread",
+      "updated_at": "2026-06-01T05:58:20+00:00"
+    },
+    "gongsunlongzi-ch03-p006": {
+      "my_note": "实际上世界没有两片相同的树叶，两个时间点的同一个人都不是同一个人。",
+      "tags": [],
+      "status": "unread",
+      "updated_at": "2026-06-01T06:03:05+00:00"
+    }
+  }
+}

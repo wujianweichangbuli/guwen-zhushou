@@ -10,7 +10,7 @@
     <aside class="sidebar">
       <div class="brand">
         <h1>古文阅读</h1>
-        <p>GitHub Pages 在线版；个人注释保存在当前浏览器</p>
+        <p>GitHub Pages 在线版；注释可同步到仓库</p>
       </div>
       <section>
         <h2>书籍</h2>
@@ -35,6 +35,15 @@
       </header>
 
       <div id="message" class="message" hidden></div>
+      <section class="sync-panel" aria-label="GitHub 注释同步">
+        <div>
+          <h2>GitHub 同步</h2>
+          <p>当前书的个人注释会先保存在本浏览器；需要长期保存时，可上传到仓库。</p>
+        </div>
+        <input id="githubToken" type="password" autocomplete="off" placeholder="GitHub token（仅保存在本浏览器）" />
+        <button id="loadGithubNotesButton" type="button">读取 GitHub 注释</button>
+        <button id="uploadGithubNotesButton" type="button">上传注释</button>
+      </section>
       <div id="searchResults" class="search-results" hidden></div>
       <div id="paragraphs" class="paragraphs"></div>
     </main>
