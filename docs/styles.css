@@ -1,0 +1,294 @@
+:root {
+  color-scheme: light;
+  --bg: #f7f5ef;
+  --panel: #fffdf8;
+  --ink: #20201d;
+  --muted: #6e6a60;
+  --line: #ded8ca;
+  --accent: #28666e;
+  --accent-strong: #174c54;
+  --note-bg: #f1f6f4;
+  --quote-bg: #f8f1e3;
+  --danger: #8f3a2f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  background: var(--bg);
+  color: var(--ink);
+  font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.sidebar {
+  height: 100vh;
+  overflow: auto;
+  position: sticky;
+  top: 0;
+  padding: 22px 18px;
+  border-right: 1px solid var(--line);
+  background: #ebe6da;
+}
+
+.brand h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.brand p,
+.book-meta {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+h2 {
+  margin: 28px 0 10px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+button,
+select,
+input,
+textarea {
+  font: inherit;
+}
+
+.book-item,
+.chapter-item,
+button {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.book-item,
+.chapter-item {
+  width: 100%;
+  margin: 0 0 8px;
+  padding: 10px 12px;
+  text-align: left;
+  border-radius: 7px;
+}
+
+.book-item.active,
+.chapter-item.active {
+  border-color: var(--accent);
+  background: #e5f0ed;
+}
+
+.main {
+  min-width: 0;
+  padding: 0 0 48px;
+}
+
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 28px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(247, 245, 239, 0.96);
+}
+
+.book-title {
+  font-size: 22px;
+  font-weight: 750;
+}
+
+.toolbar-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+#searchInput {
+  width: min(34vw, 420px);
+  min-width: 220px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--panel);
+}
+
+button {
+  padding: 10px 13px;
+  border-radius: 7px;
+}
+
+button:hover {
+  border-color: var(--accent);
+}
+
+.message {
+  margin: 18px 28px 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--note-bg);
+}
+
+.message.error {
+  color: var(--danger);
+  background: #fff5f2;
+}
+
+.search-results {
+  margin: 18px 28px 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.search-result {
+  display: block;
+  width: 100%;
+  padding: 9px 10px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  text-align: left;
+}
+
+.search-result:last-child {
+  border-bottom: 0;
+}
+
+.paragraphs {
+  max-width: 980px;
+  margin: 24px auto;
+  padding: 0 28px;
+}
+
+.chapter-heading {
+  margin: 34px 0 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+  font-size: 26px;
+}
+
+.para-card {
+  margin: 0 0 18px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.para-card.highlight {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(40, 102, 110, 0.14);
+}
+
+.para-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.para-title {
+  font-weight: 750;
+}
+
+.status {
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #fff;
+}
+
+.label {
+  margin: 18px 0 6px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.original {
+  margin: 0;
+  padding: 12px 14px;
+  border-left: 4px solid #b98f4d;
+  background: var(--quote-bg);
+  white-space: pre-wrap;
+}
+
+.plain,
+.hint,
+.system-notes {
+  margin: 0;
+}
+
+.system-notes {
+  padding-left: 22px;
+}
+
+.note-editor {
+  width: 100%;
+  min-height: 118px;
+  resize: vertical;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #fff;
+}
+
+.tags-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #fff;
+}
+
+.save-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.save-state {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+@media (max-width: 860px) {
+  body {
+    display: block;
+  }
+
+  .sidebar {
+    position: static;
+    height: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .toolbar,
+  .toolbar-actions {
+    display: block;
+  }
+
+  #searchInput,
+  #exportButton {
+    width: 100%;
+    margin-top: 10px;
+  }
+}

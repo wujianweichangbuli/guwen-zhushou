@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>古文阅读注释工具</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="brand">
+        <h1>古文阅读</h1>
+        <p>GitHub Pages 在线版；个人注释保存在当前浏览器</p>
+      </div>
+      <section>
+        <h2>书籍</h2>
+        <div id="bookList" class="book-list"></div>
+      </section>
+      <section>
+        <h2>篇章</h2>
+        <div id="chapterList" class="chapter-list"></div>
+      </section>
+    </aside>
+
+    <main class="main">
+      <header class="toolbar">
+        <div>
+          <div id="bookTitle" class="book-title">加载中</div>
+          <div id="bookMeta" class="book-meta"></div>
+        </div>
+        <div class="toolbar-actions">
+          <input id="searchInput" type="search" placeholder="搜索原文、白话、注释、标签" />
+          <button id="exportButton" type="button">下载 Markdown</button>
+        </div>
+      </header>
+
+      <div id="message" class="message" hidden></div>
+      <div id="searchResults" class="search-results" hidden></div>
+      <div id="paragraphs" class="paragraphs"></div>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,18 @@
+{
+  "books": [
+    {
+      "book_id": "gongsunlongzi",
+      "title": "公孙龙子",
+      "source": "https://ctext.org/gongsunlongzi/zhs",
+      "chapter_count": 6,
+      "paragraph_count": 108
+    },
+    {
+      "book_id": "guiguzi",
+      "title": "鬼谷子",
+      "source": "https://ctext.org/gui-gu-zi/zhs",
+      "chapter_count": 21,
+      "paragraph_count": 98
+    }
+  ]
+}
